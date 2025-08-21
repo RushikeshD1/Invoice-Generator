@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import User from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -54,3 +55,57 @@ export const register = async (req: Request, res: Response): Promise<any> => {
         });
     }
 };
+
+export const login = async (req : Request, res : Response) : Promise<any> => {
+    try{
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: "Please fill all fields!"
+            });
+        }
+
+        const user = await User.findOne({email});
+
+        if(!user){
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        if(user.password !== password){
+            return res.status(401).json({
+                success: false,
+                message: "Invalid email or password."
+            });
+        }
+
+        const token = jwt.sign(
+            {
+                id : user._id,
+                email : user.email
+            },
+            process.env.JWT_SECRET as string,
+            { expiresIn : '1h'}
+        )
+
+        return res.status(200).json({
+            success : true,
+            message : "Login successful!",
+            user : {
+                id : user._id,
+                email : user.email,
+                token : token
+            }
+        })
+    }catch(error){
+        console.error("Login error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Internal server error. Please try again later."
+        });
+    }
+}

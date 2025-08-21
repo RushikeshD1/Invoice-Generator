@@ -2,7 +2,9 @@ import express from "express";
 import dotenv from "dotenv";
 import connectDb from "./config/db.js";
 import userRoute from "./routes/user.route.js"
+import productRoute from "./routes/product.route.js"
 import cors from "cors"
+import { auth } from "./middleware/auth.middleware.js";
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ app.use(cors({
 }))
 
 app.use("/api/v1/user", userRoute);
+app.use("/api/v1/product", auth, productRoute);
 
 const port = process.env.PORT;
 
