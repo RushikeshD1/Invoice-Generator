@@ -36,7 +36,7 @@ const Product = () => {
 
     try {
       const res = await axios.get(
-        "http://localhost:3000/api/v1/product/fetch",
+        "https://invoice-generator-3-0a0g.onrender.com/api/v1/product/fetch",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -84,7 +84,7 @@ const Product = () => {
     setLoading(true);
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/v1/product/create",
+        "https://invoice-generator-3-0a0g.onrender.com/api/v1/product/create",
         {
           productName: productName.trim(),
           productQty: qty,
@@ -117,7 +117,7 @@ const Product = () => {
 
   const handleDownloadInvoice = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/v1/invoice/generate", {
+      const res = await fetch("https://invoice-generator-3-0a0g.onrender.com/api/v1/invoice/generate", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
