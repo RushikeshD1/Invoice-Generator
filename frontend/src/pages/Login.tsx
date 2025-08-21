@@ -30,7 +30,7 @@ const Login = () => {
     try {
       dispatch(loginStart());
       const res = await axios.post(
-        "https://invoice-generator-3-0a0g.onrender.com/api/v1/user/login",
+        "https://invoice-generator-webc.onrender.com/api/v1/user/login",
         {
           email,
           password,
