@@ -6,7 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { loginFailure, loginStart, loginSuccess } from "../redux/slices/authSlice";
-import type { RootState } from "../redux/store.ts";
+import type { RootState } from "../redux/store";
 
 const Login = () => {
   const [email, setEmail] = useState("");

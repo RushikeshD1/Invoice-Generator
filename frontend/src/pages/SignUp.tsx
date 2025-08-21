@@ -4,8 +4,8 @@ import { useState, type FormEvent } from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../redux/store.ts";
-import { loginStart, loginSuccess, loginFailure } from "../redux/slices/authSlice.ts";
+import type { RootState } from "../redux/store";
+import { loginStart, loginSuccess, loginFailure } from "../redux/slices/authSlice";
 
 const SignUp = () => {
     const [name, setName] = useState("");

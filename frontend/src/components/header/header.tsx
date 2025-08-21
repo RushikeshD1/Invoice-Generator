@@ -2,8 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import logo from "../../assets/logo.png";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store.ts";
-import { logout } from "../../redux/slices/authSlice.ts";
+import type { RootState } from "../../redux/store";
+import { logout } from "../../redux/slices/authSlice";
 
 const Header = () => {
 
