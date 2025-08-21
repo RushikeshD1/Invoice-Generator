@@ -1,20 +1,56 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import loginlogo from "../assets/login.png";
 import { Button } from "../components/ui/button";
-import logo from "../assets/logopage.png"
+import logo from "../assets/logopage.png";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { loginFailure, loginStart, loginSuccess } from "../redux/slices/authSlice";
+import type { RootState } from "../redux/store.ts";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const handleLogin = async () => {
-    try {
-      setEmail("");
-      setPassword("");
-    } catch (error) {
-      console.log("Something went wrong while login", error)
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isLoading, error: reduxError } = useSelector((state: RootState) => state.auth);
+
+  const handleLogin = async (event: FormEvent) => {
+    event.preventDefault();
+
+    setLocalError(null);
+
+    if (!email || !password) {
+      setLocalError("Please fill in all fields.");
+      return;
     }
-  }
+
+    try {
+      dispatch(loginStart());
+      const res = await axios.post(
+        "http://localhost:3000/api/v1/user/login",
+        {
+          email,
+          password,
+        }
+      );
+
+      if (res.data.success) {
+        dispatch(loginSuccess({ token: res.data.user.token, user: res.data.user }));
+        navigate("/");
+      } else {
+        const backendMessage = res.data.message || "Login failed.";
+        dispatch(loginFailure(backendMessage));
+      }
+
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "Something went wrong while logging in.";
+      dispatch(loginFailure(errorMessage));
+      console.error(errorMessage, error);
+    }
+  };
 
   return (
     <div className="">
@@ -25,7 +61,7 @@ const Login = () => {
         </div>
 
         {/* login form */}
-        <div className="md:w-[38%] w-full p-10  flex flex-col gap-4">
+        <div className="md:w-[38%] w-full p-10 flex flex-col gap-4">
           <div className="h-12">
             <img src={logo} alt="logo image" className="w-auto h-full" />
           </div>
@@ -36,7 +72,7 @@ const Login = () => {
               purpose.
             </span>
           </div>
-          <form className="flex flex-col gap-4">
+          <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <div></div>
             <div className="flex flex-col">
               <label className="text-sm">Email Address</label>
@@ -48,7 +84,7 @@ const Login = () => {
                 placeholder="Enter Email ID"
               />
               <span className="text-sm text-gray-400">
-                This email will displayed with your inquiry
+                This email will be displayed with your inquiry
               </span>
             </div>
             <div className="flex flex-col">
@@ -63,17 +99,19 @@ const Login = () => {
             </div>
             <div>
               <Button
-                onClick={handleLogin}
                 type="submit"
+                disabled={isLoading}
                 className="bg-[#303030] hover:bg-[#303030] cursor-pointer text-[#bbf451]"
               >
-                Login now
+                {isLoading ? 'Logging in...' : 'Login now'}
               </Button>
-              <Button className="bg-transparent hover:underline cursor-pointer text-sm text-gray-400 font-normal">
+              <Button type="button" className="bg-transparent hover:underline cursor-pointer text-sm text-gray-400 font-normal">
                 Forget password?
               </Button>
             </div>
           </form>
+          {localError && <div className="text-red-500 mt-2">{localError}</div>}
+          {reduxError && <div className="text-red-500 mt-2">{reduxError}</div>}
         </div>
       </div>
     </div>

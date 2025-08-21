@@ -1,4 +1,7 @@
 import { Button } from "../ui/button";
+import iconplus from "../../assets/formkit_add.png"
+import vectorup from "../../assets/Vector.png"
+import arrowdown from "../../assets/jam_arrow-up.png"
 
 const Product = () => {
   return (
@@ -44,6 +47,7 @@ const Product = () => {
         <div className="flex justify-center align-middle items-center">
           <Button className="bg-[#303030] hover:bg-[#303030] cursor-pointer text-[#bbf451]">
             Add Product
+            <img src={iconplus} alt="plus icon" />
           </Button>
         </div>
       </div>
@@ -53,9 +57,9 @@ const Product = () => {
           {/* Header */}
           <div className="bg-[#FFFFFFE5] rounded-tl-md rounded-tr-md p-4">
             <div className="flex flex-row w-full justify-between text-sm font-semibold">
-              <div className="px-4">Product Name</div>
+              <div className="px-4 flex flex-row gap-3 justify-center align-middle">Product Name <img className="h-[16px] mt-[1px]" src={vectorup} alt="up arrow image" /></div>
               <div className="px-4">Price</div>
-              <div className="px-4">Quantity</div>
+              <div className="px-4 flex flex-row gap-3 justify-center align-middle">Quantity <img className="h-[16px] mt-[1px] rotate-x-180" src={vectorup} alt="up arrow image" /></div>
               <div className="px-4">Total Price</div>
             </div>
           </div>
@@ -79,7 +83,7 @@ const Product = () => {
 
         {/* Button */}
         <div className="flex justify-center align-middle items-center" >
-          <Button className="bg-[#303030] hover:bg-[#303030] cursor-pointer text-[#bbf451]">Generate PDF Invoice</Button>
+          <Button className="bg-[#303030] hover:bg-[#303030] cursor-pointer text-[#bbf451] w-80">Generate PDF Invoice</Button>
         </div>
       </div>
     </div>
