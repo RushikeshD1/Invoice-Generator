@@ -15,10 +15,13 @@ interface AuthState {
   error: string | null;
 }
 
+const initialToken = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+
 const initialState: AuthState = {
   token: typeof window !== 'undefined' ? localStorage.getItem('token') : null,
   user: null,
-  isAuthenticated: false,
+  // isAuthenticated: false,
+  isAuthenticated: !!initialToken,
   isLoading: false,
   error: null,
 };

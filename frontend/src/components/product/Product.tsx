@@ -115,8 +115,35 @@ const Product = () => {
     }
   };
 
+  const handleDownloadInvoice = async () => {
+    try {
+      const res = await fetch("http://localhost:3000/api/v1/invoice/generate", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+
+      console.log(res);
+
+      if (!res.ok) throw new Error("Failed to download invoice");
+
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "invoice.pdf";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <div className="flex flex-col gap-4 md:px-0 px-10 ">
+    <div className="flex flex-col gap-4 md:px-4 px-10 ">
       {/* add product */}
       <div className="flex flex-col gap-1 md:w-96">
         <h1 className="text-2xl font-semibold">Add Products</h1>
@@ -127,7 +154,7 @@ const Product = () => {
       </div>
       <div className="flex flex-col gap-4">
         {/* product data form */}
-        <div className="flex md:flex-row flex-col justify-between md:gap-4 gap-4 ">
+        <div className="flex flex-wrap md:flex-row flex-col justify-between md:gap-4 gap-4 md:p-0 p-5">
           <div className="flex flex-col gap-1">
             <label>Product Name</label>
             <input
@@ -180,75 +207,112 @@ const Product = () => {
           </Button>
         </div>
       </div>
-      <div className="flex flex-col w-full text-black gap-4">
-        {/* table */}
-        <div className="flex flex-col w-full border border-gray-700 rounded-tl-md rounded-tr-md">
-          {/* Header */}
-          <div className="bg-[#FFFFFFE5] rounded-tl-md rounded-tr-md p-4">
-            <div className="grid grid-cols-4 text-sm font-semibold">
-              <div className="px-4 flex gap-2 items-center justify-start">
-                Product Name{" "}
-                <img className="h-[16px]" src={vectorup} alt="up arrow" />
-              </div>
-              <div className="px-4 text-center">Price</div>
-              <div className="px-4 flex gap-2 items-center justify-center">
-                Quantity{" "}
-                <img
-                  className="h-[16px] rotate-x-180"
-                  src={vectorup}
-                  alt="up arrow"
-                />
-              </div>
-              <div className="px-4 text-center">Total Price</div>
-            </div>
-          </div>
+      <div className="flex flex-col text-black gap-4">
+  {/* Table Container */}
+  <div className="border border-gray-700 rounded-md">
+    {/* Header (hidden on mobile) */}
+    <div className="hidden md:block bg-[#FFFFFFE5] rounded-t-md p-4">
+      <div className="grid grid-cols-4 text-sm font-semibold">
+        <div className="px-4 flex gap-2 items-center justify-start">
+          Product Name
+          <img className="h-[16px]" src={vectorup} alt="up arrow" />
+        </div>
+        <div className="px-4 text-center">Price</div>
+        <div className="px-4 flex gap-2 items-center justify-center">
+          Quantity
+          <img
+            className="h-[16px] rotate-x-180"
+            src={vectorup}
+            alt="up arrow"
+          />
+        </div>
+        <div className="px-4 text-center">Total Price</div>
+      </div>
+    </div>
 
-          {/* Body */}
-          <div className="flex flex-col divide-y divide-gray-700">
-            {products.length > 0 ? (
-              products.map((p) => (
-                <div
-                  key={p._id}
-                  className="grid grid-cols-4 px-4 py-2 text-white border-gray-700 border-b"
-                >
-                  <div className="text-left">{p.productName}</div>
-                  <div className="text-center">₹ {p.productRate}</div>
-                  <div className="text-center">{p.productQty}</div>
-                  <div className="text-center">
-                    ₹ {p.productRate * p.productQty}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="grid grid-cols-4 px-4 py-2 text-white">
-                <div className="col-span-4 text-center">No products found</div>
-              </div>
-            )}
-          </div>
-
-          {products.length > 0 ? (
-            <div>
-              <div className="grid grid-cols-4 px-4 py-2 font-semibold text-white md:pr-32">
-                <div className="col-span-3">Sub-Total</div>
-                <div className="text-right">₹ {subTotal.toFixed(2)}</div>
-              </div>
-              <div className="grid grid-cols-4 px-4 py-2 font-semibold text-white md:pr-32">
-                <div className="col-span-3">Incl. GST (18%)</div>
-                <div className="text-right">₹ {totalInclGst.toFixed(2)}</div>
+    {/* Product Rows */}
+    <div className="flex flex-col divide-y divide-gray-700">
+      {products.length > 0 ? (
+        products.map((p) => (
+          <div
+            key={p._id}
+            className="border-b border-gray-700 px-4 py-2 text-white"
+          >
+            {/* Desktop/Table view */}
+            <div className="hidden md:grid md:grid-cols-4">
+              <div className="text-left">{p.productName}</div>
+              <div className="text-center">₹ {p.productRate}</div>
+              <div className="text-center">{p.productQty}</div>
+              <div className="text-center">
+                ₹ {p.productRate * p.productQty}
               </div>
             </div>
-          ) : (
-            <div></div>
-          )}
+
+            {/* Mobile/Tablet view */}
+            <div className="flex flex-col gap-1 md:hidden text-sm">
+              <div className="flex justify-between">
+                <span className="font-semibold">Product:</span>
+                <span>{p.productName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Price:</span>
+                <span>₹ {p.productRate}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Quantity:</span>
+                <span>{p.productQty}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="font-semibold">Total:</span>
+                <span>₹ {p.productRate * p.productQty}</span>
+              </div>
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="px-4 py-2 text-white text-center">No products found</div>
+      )}
+    </div>
+
+    {/* Totals */}
+    {products.length > 0 && (
+      <div>
+        {/* Desktop view */}
+        <div className="hidden md:grid md:grid-cols-4 px-4 py-2 font-semibold text-white">
+          <div className="col-span-3">Sub-Total</div>
+          <div className="text-right">₹ {subTotal.toFixed(2)}</div>
+        </div>
+        <div className="hidden md:grid md:grid-cols-4 px-4 py-2 font-semibold text-white">
+          <div className="col-span-3">Incl. GST (18%)</div>
+          <div className="text-right">₹ {totalInclGst.toFixed(2)}</div>
         </div>
 
-        {/* Button */}
-        <div className="flex justify-center align-middle items-center">
-          <Button className="bg-[#303030] hover:bg-[#303030] cursor-pointer text-[#bbf451] w-80">
-            Generate PDF Invoice
-          </Button>
+        {/* Mobile view */}
+        <div className="flex flex-col gap-1 px-4 py-2 font-semibold text-white md:hidden">
+          <div className="flex justify-between">
+            <span>Sub-Total</span>
+            <span>₹ {subTotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Incl. GST (18%)</span>
+            <span>₹ {totalInclGst.toFixed(2)}</span>
+          </div>
         </div>
       </div>
+    )}
+  </div>
+
+  {/* Button */}
+  <div
+    onClick={handleDownloadInvoice}
+    className="flex justify-center align-middle items-center"
+  >
+    <Button className="bg-[#303030] hover:bg-[#303030] cursor-pointer text-[#bbf451] w-80">
+      Generate PDF Invoice
+    </Button>
+  </div>
+</div>
+
     </div>
   );
 };
